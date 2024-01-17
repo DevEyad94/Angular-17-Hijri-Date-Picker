@@ -1,27 +1,111 @@
-# Test
+# Angular 17 Hijri Date Picker using Angular Material Example
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.10.
+This project is a template of how to use angular material for hijri calendar system.
 
-## Development server
+## For Knowledge only
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+You have to install those libraries
 
-## Code scaffolding
+```
+npm install ngx-angular-material-hijri-adapter
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+ng add @angular/material
 
-## Build
+npm install moment-hijri
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Import Libraries & Providers
 
-## Running unit tests
+If your project standalone you will import the libraries and providers in the component inself such as:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import {
+  MatDatepickerModule,
+  MatDatepickerIntl,
+} from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+} from '@angular/material/core';
+import 'moment/locale/ar-sa';
+import { NgxAngularMaterialHijriAdapterModule } from 'ngx-angular-material-hijri-adapter';
+import {
+  NgxAngularMaterialHijriAdapterService,
+  DateLocaleKeys,
+  MOMENT_HIJRI_DATE_FORMATS,
+} from 'ngx-angular-material-hijri-adapter';
 
-## Running end-to-end tests
+@Component({
+  selector: 'app-root',
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: NgxAngularMaterialHijriAdapterService,
+    },
+    // Change the format by using `MOMENT_HIJRI_DATE_FORMATS` for Dates and `MOMENT_HIJRI_DATE_TIME_FORMATS` for date/time.
+    { provide: MAT_DATE_FORMATS, useValue: MOMENT_HIJRI_DATE_FORMATS },
+    // Change the localization to arabic by using `AR_SA` not `AR` only and `EN_US` not `EN` only.
+    { provide: MAT_DATE_LOCALE, useValue: DateLocaleKeys.AR_SA },
+  ],
+  standalone: true,
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatButtonModule,
+    NgxAngularMaterialHijriAdapterModule,
+    MatMomentDateModule,
+  ],
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+})
 
-## Further help
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Class Code
+
+```
+export class AppComponent implements OnInit {
+  title = 'Angular Hijri Date Picker using Angular Material Example';
+  constructor(
+    private _adapter: DateAdapter<any>,
+    private _intl: MatDatepickerIntl,
+    @Inject(MAT_DATE_LOCALE) private _locale: string
+  ) {}
+
+  ngOnInit() {
+    let lang = 'ar-sa';
+    this._adapter?.setLocale(lang);
+  }
+
+  french() {
+    this._locale = 'ar-sa';
+    this._adapter.setLocale(this._locale);
+  }
+
+  updateCloseButtonLabel(label: string) {
+    this._intl.closeCalendarLabel = label;
+    this._intl.changes.next();
+  }
+
+  getDateFormatString(): string {
+    if (this._locale === 'ja-JP') {
+      return 'YYYY/MM/DD';
+    } else if (this._locale === 'fr') {
+      return 'DD/MM/YYYY';
+    }
+    return '';
+  }
+}
+```
+
+## Thankfulness
+
+I would thanks to developer [Ebrahiem-Gamal-Mohamed](https://github.com/Ebrahiem-Gamal-Mohamed) for creating such a greatful Hijri Date Adapter.
